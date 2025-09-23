@@ -4,8 +4,11 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 照片编辑器 (Nano Banana)</title>
+    <title>Nano PS AI 照片编辑器 | 释放创意魔法</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script type="importmap">
 {
   "imports": {
@@ -17,14 +20,58 @@
 }
 </script>
 <style>
-  body {
-    background-color: #f1f5f9; /* slate-100 as fallback */
-    background-image: radial-gradient(ellipse at top, #ffffff, #f1f5f9);
-    background-attachment: fixed;
+  :root {
+    --bg-color: #F7F8FC;
+    --dot-color: #DCE1F0;
+    --glow-color: #a3b1ff;
   }
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background-image: 
+      radial-gradient(circle at 15% 25%, rgba(135, 206, 250, 0.3), transparent 30%),
+      radial-gradient(circle at 85% 75%, rgba(255, 182, 193, 0.3), transparent 40%);
+    animation: aurora-glow 15s infinite alternate;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
+  }
+
+  @keyframes aurora-glow {
+    0% {
+      transform: translate(0%, 0%) rotate(0deg) scale(1.2);
+    }
+    50% {
+      transform: translate(10%, -10%) rotate(180deg) scale(1.5);
+    }
+    100% {
+      transform: translate(-10%, 10%) rotate(360deg) scale(1.2);
+    }
+  }
+
 </style>
 </head>
-  <body class="text-slate-800">
+  <body class="text-slate-700">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

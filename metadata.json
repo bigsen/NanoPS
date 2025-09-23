@@ -1,5 +1,5 @@
 {
-  "name": "AI 照片编辑器",
+  "name": "Nano PS 照片编辑器",
   "description": "一款使用 Gemini (Nano Banana) 模型进行 AI 照片编辑的应用程序。支持自定义提示词、模板和连续编辑，让您的创意无限延伸。",
   "requestFramePermissions": []
 }
