@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { ImageData } from './types';
 import { editImageWithGemini } from './services/geminiService';
@@ -7,6 +8,7 @@ import ImageDisplay from './components/ImageDisplay';
 import EditPanel from './components/EditPanel';
 import ErrorAlert from './components/ErrorAlert';
 import Spinner from './components/Spinner';
+import ImagePreviewModal from './components/ImagePreviewModal';
 
 // Result component to display the generated image
 interface ResultDisplayProps {
@@ -15,6 +17,8 @@ interface ResultDisplayProps {
 }
 
 const ResultDisplay: React.FC<ResultDisplayProps> = ({ image, onAddToInput }) => {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   const handleDownload = () => {
     const link = document.createElement('a');
     link.href = `data:${image.mimeType};base64,${image.base64}`;
@@ -25,36 +29,58 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ image, onAddToInput }) =>
     document.body.removeChild(link);
   };
 
+  const imageUrl = `data:${image.mimeType};base64,${image.base64}`;
+
   return (
-    <div className="w-full bg-white p-4 rounded-xl shadow-lg space-y-4 flex flex-col items-center animate-fade-in ring-1 ring-slate-900/5">
-        <div className="w-full aspect-square bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center ring-1 ring-slate-200">
+    <>
+      <div className="w-full bg-white p-4 rounded-xl shadow-lg space-y-4 flex flex-col items-center animate-fade-in ring-1 ring-slate-900/5">
+        <div
+            className="w-full h-[420px] bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center ring-1 ring-slate-200 cursor-pointer group relative"
+            onClick={() => setIsPreviewOpen(true)}
+            role="button"
+            tabIndex={0}
+            aria-label="点击预览大图"
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsPreviewOpen(true)}
+        >
             <img
-                src={`data:${image.mimeType};base64,${image.base64}`}
+                src={imageUrl}
                 alt="Generated result"
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
             />
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                </svg>
+            </div>
         </div>
-      <div className="flex w-full gap-4">
-        <button
-          onClick={handleDownload}
-          className="flex-1 flex justify-center items-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-sky-600 hover:to-indigo-700 transition-all transform hover:scale-105"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          下载图片
-        </button>
-        <button
-          onClick={onAddToInput}
-          className="flex-1 flex justify-center items-center gap-2 px-6 py-3 bg-slate-200 text-slate-700 font-semibold rounded-lg shadow-md hover:bg-slate-300 transition-all transform hover:scale-105"
-        >
-           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          用作输入
-        </button>
+        <div className="flex w-full gap-4">
+          <button
+            onClick={handleDownload}
+            className="flex-1 flex justify-center items-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-sky-600 hover:to-indigo-700 transition-all transform hover:scale-105"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            下载图片
+          </button>
+          <button
+            onClick={onAddToInput}
+            className="flex-1 flex justify-center items-center gap-2 px-6 py-3 bg-slate-200 text-slate-700 font-semibold rounded-lg shadow-md hover:bg-slate-300 transition-all transform hover:scale-105"
+          >
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            用作输入
+          </button>
+        </div>
       </div>
-    </div>
+      {isPreviewOpen && (
+        <ImagePreviewModal
+          imageUrl={imageUrl}
+          onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
+    </>
   );
 };
 
@@ -146,7 +172,7 @@ const App: React.FC = () => {
             <h2 className="text-xl font-bold text-slate-900 pb-2 border-b border-slate-200">
                 <span className="text-sky-500 font-black">3.</span> 查看生成结果
             </h2>
-            <div className="bg-white p-4 rounded-xl shadow-inner min-h-[360px] flex items-center justify-center ring-1 ring-slate-900/5">
+            <div className="bg-white p-4 rounded-xl shadow-inner min-h-[300px] flex items-center justify-center ring-1 ring-slate-900/5">
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center text-center p-2">
                        <Spinner />
